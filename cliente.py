@@ -18,9 +18,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.sendall(mensagem.encode())
 
     while True:
-        mensagem = input('Escreva alguma mensagem: \n')
+        response = sock.recv(1024)
+        mensagem = input(response.decode('utf-8'))
         sock.sendall(mensagem.encode())
         
-        if mensagem == 'END' or mensagem == 'end': 
+        if mensagem == '0': 
             break
         

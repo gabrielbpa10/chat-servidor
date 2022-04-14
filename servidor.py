@@ -59,10 +59,17 @@ class HttpRequest(Thread):
                     break
 
             while(TRUE):
+                self.conexao.send(b'Informe com quem voce deseja se comunicar: \n 0 - Logout \n 1 - Todos \n')
                 mensagem = self.conexao.recv(1024).decode('utf-8')
-                if mensagem == 'end':
+                
+                if mensagem == '0':
                     print(f'Usuário {self.addr} desconectado')
-                elif mensagem and mensagem != 'end':
+                    break
+                elif mensagem and mensagem == '1':
+                    self.conexao.send('Envie uma mensagem: \n'.encode())
+                    mensagem = self.conexao.recv(1024).decode('utf-8')
                     print(f'Mensagem recebida >>> {mensagem}')
+                    self.conexao.sendall(mensagem.encode())
+                    print(f'Mensagem enviada >>> {mensagem}')
 
             # self.conexao.sendall(b"Mensagem recebida do cliente")
