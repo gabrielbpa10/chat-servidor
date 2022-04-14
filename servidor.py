@@ -1,4 +1,5 @@
 import socket, os
+import json
 from tkinter import TRUE
 from threading import Thread
 
@@ -34,6 +35,29 @@ class HttpRequest(Thread):
     def run(self):
         with self.conexao:
             print(f'Conectado com >>> {self.addr}')
+            self.conexao.sendall(b"Seja Bem Vindo!")
+
+            with open('usuarios.json', encoding='utf-8') as usuarios:
+                dados = json.load(usuarios)
+            
+            while(TRUE):
+                self.conexao.send('Informe seu usuario: \n'.encode())
+                USUARIO = self.conexao.recv(1024).decode('utf-8')
+                self.conexao.send('Agora, informe sua senha: \n'.encode())
+                SENHA = self.conexao.recv(1024).decode('utf-8')
+
+                status = False
+                for login in dados:
+                    if USUARIO == login['username'] and SENHA == login['password']:
+                        self.conexao.send('Acesso permitido!'.encode())
+                        status = True
+                        break
+                    else:
+                        self.conexao.send('Acesso negado! :() Tente novamente. \n'.encode())
+
+                if status == True:
+                    break
+
             while(TRUE):
                 mensagem = self.conexao.recv(1024).decode('utf-8')
                 if mensagem == 'end':
@@ -41,4 +65,4 @@ class HttpRequest(Thread):
                 elif mensagem and mensagem != 'end':
                     print(f'Mensagem recebida >>> {mensagem}')
 
-            # conexao.sendall(b"Mensagem recebida do cliente")
+            # self.conexao.sendall(b"Mensagem recebida do cliente")
