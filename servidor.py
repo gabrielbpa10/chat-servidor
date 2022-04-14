@@ -1,4 +1,5 @@
 import socket
+from tkinter import TRUE
 
 HOST = ""
 PORT = 5000
@@ -14,8 +15,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as comunicacao:
 
     with conexao:
         print(f'Conectado com >>> {addr}')
-        mensagem = conexao.recv(1024).decode('utf-8')
+        while(TRUE):
+            mensagem = conexao.recv(1024).decode('utf-8')
+            if mensagem == 'end':
+                print(f'Usuário {addr} desconectado')
+            elif mensagem and mensagem != 'end':
+                print(f'Mensagem recebida >>> {mensagem}')
 
-        print(f'Mensagem recebida >>> {mensagem}')
-
-        conexao.sendall(b"Mensagem recebida do cliente")
+            # conexao.sendall(b"Mensagem recebida do cliente")
