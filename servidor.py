@@ -31,6 +31,7 @@ class HttpRequest(Thread):
         self.addr = addr
         self.CRLF = '\r\n'
         self.buffer_size = 4096
+        self.dicionarios = []
     
     def run(self):
         with self.conexao:
@@ -47,8 +48,26 @@ class HttpRequest(Thread):
                 SENHA = self.conexao.recv(1024).decode('utf-8')
 
                 status = False
+                self.dicionarios = []
                 for login in dados:
                     if USUARIO == login['username'] and SENHA == login['password']:
+                        with open('logs.json', encoding='utf-8') as usuarios:
+                            dados = json.load(usuarios)
+                            print(dados)
+                        if len(dados) > 0:
+                            dicionarios = dados
+                        
+                        dicionario = {
+                            'username': USUARIO,
+                            'ip': self.addr[0],
+                            'port':self.addr[1]
+                        }
+                        self.dicionarios.append(dicionario)
+
+                        json_object = json.dumps(self.dicionarios, indent=1)
+                        with open('logs.json','w') as escrever:
+                            escrever.write(json_object)
+                        
                         self.conexao.send('Acesso permitido!'.encode())
                         status = True
                         break
@@ -69,7 +88,12 @@ class HttpRequest(Thread):
                     self.conexao.send('Envie uma mensagem: \n'.encode())
                     mensagem = self.conexao.recv(1024).decode('utf-8')
                     print(f'Mensagem recebida >>> {mensagem}')
-                    self.conexao.sendall(mensagem.encode())
+                    for d in self.dicionarios:
+                        print(d)
+                        cliente = '(' + str(d['ip']) + ',' + str(d['port']) + ')'
+                        print(cliente)
+                        #TypeError: sendto(): AF_INET address must be tuple, not str
+                        self.conexao.sendto(mensagem.encode(),0,cliente)
                     print(f'Mensagem enviada >>> {mensagem}')
 
             # self.conexao.sendall(b"Mensagem recebida do cliente")
