@@ -1,0 +1,6 @@
+1 - Listar atividades (usuarios e sair)
+2 - Escolher com quem falar
+2.1 - Assim quem escolher, listar a frases conversadas anteriormente
+2.2 - Escrever o que desejar
+2.2 - se escolher opcao sair, o cliente sai do chat
+3 - Salvar a escrita no arquivo em json

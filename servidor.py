@@ -48,52 +48,34 @@ class HttpRequest(Thread):
                 SENHA = self.conexao.recv(1024).decode('utf-8')
 
                 status = False
-                self.dicionarios = []
                 for login in dados:
                     if USUARIO == login['username'] and SENHA == login['password']:
-                        with open('logs.json', encoding='utf-8') as usuarios:
-                            dados = json.load(usuarios)
-                            print(dados)
-                        if len(dados) > 0:
-                            dicionarios = dados
-                        
-                        dicionario = {
-                            'username': USUARIO,
-                            'ip': self.addr[0],
-                            'port':self.addr[1]
-                        }
-                        self.dicionarios.append(dicionario)
-
-                        json_object = json.dumps(self.dicionarios, indent=1)
-                        with open('logs.json','w') as escrever:
-                            escrever.write(json_object)
-                        
-                        self.conexao.send('Acesso permitido!'.encode())
                         status = True
+                        self.conexao.send('Acesso permitido!'.encode())
                         break
-                    else:
-                        self.conexao.send('Acesso negado! :() Tente novamente. \n'.encode())
 
                 if status == True:
                     break
+                else:
+                    self.conexao.send('Acesso negado! :() Tente novamente. \n'.encode())
 
             while(TRUE):
-                self.conexao.send(b'Informe com quem voce deseja se comunicar: \n 0 - Logout \n 1 - Todos \n')
+                self.conexao.send(b'##### MENU #################: \n 0 - Logout \n 1 - Todos \n')
                 mensagem = self.conexao.recv(1024).decode('utf-8')
                 
                 if mensagem == '0':
                     print(f'Usuário {self.addr} desconectado')
+                    self.conexao.send(b'0')
                     break
                 elif mensagem and mensagem == '1':
-                    self.conexao.send('Envie uma mensagem: \n'.encode())
-                    mensagem = self.conexao.recv(1024).decode('utf-8')
-                    print(f'Mensagem recebida >>> {mensagem}')
-                    for d in self.dicionarios:
-                        print(d)
-                        cliente = '(' + str(d['ip']) + ',' + str(d['port']) + ')'
-                        print(cliente)
-                        #TypeError: sendto(): AF_INET address must be tuple, not str
-                        self.conexao.sendto(mensagem.encode(),0,cliente)
-                    print(f'Mensagem enviada >>> {mensagem}')
-
-            # self.conexao.sendall(b"Mensagem recebida do cliente")
+                     with open('database.json', encoding='utf-8') as usuarios:
+                        dados = json.load(usuarios)
+                        
+                        vetorMensagem = []
+                        for msn in dados:
+                            if msn['tipo'] == 'grupo':
+                                opcao = 'Data da mensagem (' + msn['tempo'] + ') \n' + 'Mensagem >>> ' + msn['mensagem'] + ' \n'
+                                vetorMensagem.append(opcao)
+                                # mensagem = self.conexao.recv(1024).decode('utf-8')
+                                # print(f'Mensagem recebida >>> {mensagem}')
+                        self.conexao.send(opcao.encode())

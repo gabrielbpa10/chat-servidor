@@ -17,6 +17,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             mensagem = input(data.decode('utf-8'))
             sock.sendall(mensagem.encode())
 
+    print('Conectado ;)')
     while True:
         response = sock.recv(1024)
         mensagem = input(response.decode('utf-8'))
@@ -24,4 +25,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         
         if mensagem == '0': 
             break
-        
+        else:
+            response = sock.recv(1024)
+            print(response.decode('utf-8'))
